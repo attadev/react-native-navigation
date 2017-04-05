@@ -15,6 +15,7 @@ const NavigationSpecific = {
   resetTo: platformSpecific.navigatorResetTo
 };
 
+const loading = false;
 class Navigator {
   constructor(navigatorID, navigatorEventID, screenInstanceID) {
     this.navigatorID = navigatorID;
@@ -25,7 +26,10 @@ class Navigator {
   }
 
   push(params = {}) {
-    return NavigationSpecific.push(this, params);
+    if(!loading){
+      loading = true;
+      return NavigationSpecific.push(this, params);
+    }
   }
 
   pop(params = {}) {
@@ -144,6 +148,9 @@ class Navigator {
   onNavigatorEvent(event) {
     if (this.navigatorEventHandler) {
       this.navigatorEventHandler(event);
+    }
+    if(event.id == 'didAppear'){
+      setTimeout(() => {loading = false}, 500);
     }
   }
 
