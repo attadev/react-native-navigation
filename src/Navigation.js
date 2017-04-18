@@ -1,6 +1,6 @@
 /*eslint-disable*/
 import React from 'react';
-import {AppRegistry} from 'react-native';
+import {AppRegistry, View, ActivityIndicator} from 'react-native';
 import platformSpecific from './deprecated/platformSpecificDeprecated';
 import Screen from './Screen';
 
@@ -57,6 +57,32 @@ function _registerComponentNoRedux(screenID, generator) {
   return generatorWrapper;
 }
 
+class WrapperComponent extends React.Component {
+	state = {
+		showScreen: false,
+	};
+	componentDidMount() {
+		this.timeout = setTimeout(() => {
+			this.setState({ showScreen: true });
+		}, 10);
+	}
+
+	componentWillUnmount() {
+		clearTimeout(this.timeout);
+	}
+
+	render() {
+		if (this.state.showScreen) {
+			return this.props.renderScreen();
+		}
+		return (
+			<View style={{ flex: 1, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+				<ActivityIndicator animating={true} size='large' />
+			</View>
+		);
+	}
+}
+
 function _registerComponentRedux(screenID, generator, store, Provider, options) {
   const generatorWrapper = function() {
     const InternalComponent = generator();
@@ -78,11 +104,12 @@ function _registerComponentRedux(screenID, generator, store, Provider, options) 
       }
 
       render() {
-        return (
+		const screen = (
           <Provider store={store} {...options}>
             <InternalComponent testID={screenID} navigator={this.navigator} {...this.state.internalProps} />
           </Provider>
-        );
+	    );
+        return <WrapperComponent renderScreen={() => screen} />;
       }
     };
   };
