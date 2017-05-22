@@ -149,9 +149,6 @@ class Navigator {
     if (this.navigatorEventHandler) {
       this.navigatorEventHandler(event);
     }
-    if(event.id == 'didAppear'){
-      setTimeout(() => {loading = false}, 500);
-    }
   }
 
   cleanup() {
@@ -172,7 +169,9 @@ export default class Screen extends Component {
       this.navigator = new Navigator(props.navigatorID, props.navigatorEventID, props.screenInstanceID);
     }
   }
-
+  componentDidMount() {
+	  setTimeout(() => {loading = false}, 500);
+  }
   componentWillUnmount() {
     if (this.navigator) {
       this.navigator.cleanup();
